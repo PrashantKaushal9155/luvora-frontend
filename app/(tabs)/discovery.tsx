@@ -1,9 +1,9 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
 export default function DiscoveryScreen(){
     return (
         <View>
-            <Text>Discovery Screen</Text>
+            <Text>Discovery Screen 1</Text>
         </View>
     )
 }
