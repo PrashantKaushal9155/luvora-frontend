@@ -29,6 +29,18 @@ const styles = StyleSheet.create({
         color: colors.primary,
         fontWeight: "600",
     },
+    error: {
+        color: "red",
+        marginBottom: 10,
+    },
+    icon: {
+        position: "absolute",
+        right: 15,
+        top: 14,
+    },
+    passwordContainer: {
+        position: "relative",
+    },
 });
 
 export default styles;
