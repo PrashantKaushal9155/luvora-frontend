@@ -1,0 +1,25 @@
+import colors from "@/constants/colors";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
+
+export default function CustomButton({ title, onPress }: any) {
+    return (
+        <TouchableOpacity style={styles.button} onPress={onPress}>
+            <Text style={styles.text}>{title}</Text>
+        </TouchableOpacity>
+    );
+}
+
+const styles = StyleSheet.create({
+    button: {
+        backgroundColor: colors.primary,
+        paddingVertical: 15,
+        borderRadius: 10,
+        alignItems: "center",
+        marginTop: 10,
+    },
+    text: {
+        color: colors.white,
+        fontSize: 16,
+        fontWeight: "600",
+    },
+});
