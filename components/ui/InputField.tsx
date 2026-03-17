@@ -14,5 +14,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         backgroundColor: colors.white,
         marginBottom: 15,
+        paddingRight: 45,
     },
 });

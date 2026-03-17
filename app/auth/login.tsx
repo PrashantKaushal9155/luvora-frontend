@@ -2,17 +2,30 @@ import CustomButton from "@/components/ui/CustomButton";
 import InputField from "@/components/ui/InputField";
 import { login } from "@/services/authService";
 import { useAuthStore } from "@/store/authStore";
+import { Ionicons } from "@expo/vector-icons";
+import { Formik } from "formik";
 import { useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
+import * as Yup from "yup";
 import styles from "./login.styles";
+
+const LoginSchema = Yup.object().shape({
+    email: Yup.string()
+        .email("Invalid email")
+        .required("Email is required"),
+    password: Yup.string()
+        .min(6, "Too short")
+        .required("Password is required"),
+});
 
 export default function LoginScreen() {
     const setToken = useAuthStore((state) => state.setToken);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
-    const handleLogin = async () => {
+    const handleLogin = async (email: string, password: string) => {
         try {
             const res = await login(email, password);
 
@@ -23,28 +36,64 @@ export default function LoginScreen() {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Welcome to Luvora❤️</Text>
-            <Text style={styles.subtitle}>Login to your account</Text>
-            
-            <InputField
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-            />
+        <Formik
+            initialValues={{ email: "", password: "" }}
+            validationSchema={LoginSchema}
+            onSubmit={(values) => {
+                handleLogin(values.email, values.password);
+            }}
+        >
+            {({
+                handleChange,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+            }) => (
+                <View style={styles.container}>
+                    <Text style={styles.title}>Welcome to Luvora❤️</Text>
+                    <Text style={styles.subtitle}>Login to your account</Text>
+                    
+                    <InputField
+                        placeholder="Email"
+                        value={values.email}
+                        onChangeText={handleChange("email")}
+                    />
+                    {touched.email && errors.email && (
+                        <Text style={styles.error}>{errors.email}</Text>
+                    )}
 
-            <InputField
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-            />
+                    <View style={styles.passwordContainer}>
+                        <InputField
+                            placeholder="Password"
+                            value={values.password}
+                            onChangeText={handleChange("password")}
+                            secureTextEntry={!showPassword}
+                        />
 
-            <CustomButton title="Login" onPress={handleLogin} />
+                        <TouchableOpacity
+                            style={styles.icon}
+                            onPress={() => setShowPassword(!showPassword)}
+                        >
+                            <Ionicons
+                            name={showPassword ? "eye-off" : "eye"}
+                            size={22}
+                            color="#64748b"
+                            />
+                        </TouchableOpacity>
+                    </View>
 
-            <Text style={styles.footer}>
-                Don't have an account? <Text style={styles.link}>Sign up</Text>
-            </Text>
-        </View>
+                    {touched.password && errors.password && (
+                        <Text style={styles.error}>{errors.password}</Text>
+                    )}
+
+                    <CustomButton title="Login" onPress={handleSubmit as any} />
+
+                    <Text style={styles.footer}>
+                        Don't have an account? <Text style={styles.link}>Sign up</Text>
+                    </Text>
+                </View>
+            )}
+        </Formik>
     );
 }
