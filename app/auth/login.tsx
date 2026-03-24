@@ -3,6 +3,7 @@ import InputField from "@/components/ui/InputField";
 import { login } from "@/services/authService";
 import { useAuthStore } from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import { useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
@@ -19,20 +20,29 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function LoginScreen() {
-    const setToken = useAuthStore((state) => state.setToken);
+    const setAuth = useAuthStore((state) => state.setAuth);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
 
     const handleLogin = async (email: string, password: string) => {
         try {
+            console.log("Calling login api...")
             const res = await login(email, password);
+            console.log("login res:", res);
 
-            setToken(res.accessToken)
-        } catch (error: any) {
-            Alert.alert("Login failed", "Invalid credentials");
-        }
+            setAuth(res.accessToken, res.refreshToken, res.profileCompleted);
+
+            router.replace("/(tabs)/discovery");
+        } catch (err: any) {
+  console.log("FULL ERROR:", err);
+  console.log("RESPONSE:", err?.response);
+  console.log("DATA:", err?.response?.data);
+
+  Alert.alert("Login Failed", JSON.stringify(err?.response?.data || "Error"));
+}
     };
 
     return (
@@ -51,7 +61,7 @@ export default function LoginScreen() {
                 touched,
             }) => (
                 <View style={styles.container}>
-                    <Text style={styles.title}>Welcome to Luvora❤️</Text>
+                    <Text style={styles.title}>Welcome to Luvora</Text>
                     <Text style={styles.subtitle}>Login to your account</Text>
                     
                     <InputField

@@ -1,11 +1,31 @@
 import { create } from "zustand";
 
 type AuthState = {
-    token: string | null;
-    setToken: (token: string | null) => void;
+    accessToken: string | null;
+    refreshToken: string | null;
+    profileCompleted: boolean;
+
+    setAuth: (
+        accessToken: string,
+        refreshToken: string,
+        profileCompleted: boolean
+    ) => void;
+
+    logout: () => void;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-    token: null,
-    setToken: (token) => set({ token }),
+    accessToken: null,
+    refreshToken: null,
+    profileCompleted: false,
+
+    setAuth: (accessToken, refreshToken, profileCompleted) => 
+        set({ accessToken, refreshToken, profileCompleted }),
+
+    logout: () => 
+        set({
+            accessToken: null,
+            refreshToken: null,
+            profileCompleted: false,
+        }),
 }));
