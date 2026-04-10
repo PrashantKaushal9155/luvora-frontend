@@ -41,6 +41,17 @@ const styles = StyleSheet.create({
     passwordContainer: {
         position: "relative",
     },
+    option: {
+        padding: spacing.md,
+        borderWidth: 1,
+        borderColor: colors.border,
+        borderRadius: 10,
+        marginBottom: spacing.sm
+    },
+    selected: {
+        borderColor: colors.primary,
+        backgroundColor: "#eef2ff",
+    },
 });
 
 export default styles;
