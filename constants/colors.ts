@@ -6,6 +6,7 @@ const colors = {
   border: "#e2e8f0",
   white: "#ffffff",
   red: "#ff4d6d",
+  disabledColor: "#eee",
 };
 
 export default colors;

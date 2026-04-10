@@ -29,20 +29,34 @@ export default function LoginScreen() {
 
     const handleLogin = async (email: string, password: string) => {
         try {
-            console.log("Calling login api...")
-            const res = await login(email, password);
-            console.log("login res:", res);
+            console.log("LoginClicked");
+            const response = await login(email, password);
 
-            setAuth(res.accessToken, res.refreshToken, res.profileCompleted);
+            if (!response || response.status !== 200) {
+                Alert.alert("Server Error", "We're having trouble reaching the server. Please try again in a moment.");
+                return;
+            }
 
-            router.replace("/(tabs)/discovery");
-        } catch (err: any) {
-  console.log("FULL ERROR:", err);
-  console.log("RESPONSE:", err?.response);
-  console.log("DATA:", err?.response?.data);
+            if (!response.profileCompleted) {
+                router.replace("/profile/setup");
+            } else {
+                router.replace("/(tabs)/discovery");
+            }
 
-  Alert.alert("Login Failed", JSON.stringify(err?.response?.data || "Error"));
-}
+            setAuth(response.accessToken, response.refreshToken, response.profileCompleted);
+        } catch (error: any) {
+            console.log("Login Failed", JSON.stringify(error?.response?.data || "Error"));
+            if (error.response) {
+                // Server responded with error (500, 404, etc.)
+                Alert.alert("Server Issue","Something went wrong on our side. Please try again later.");
+            } else if (error.request) {
+                // No response received
+                Alert.alert("Connection Problem", "Unable to reach the server. Check your internet connection.");
+            } else {
+                // Something else
+                Alert.alert("Unexpected Error", "Something unexpected happened. Please try again.");
+            }
+        }
     };
 
     return (
