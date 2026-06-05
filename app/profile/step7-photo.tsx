@@ -91,7 +91,10 @@ export default function Step7({ form, setForm, next, back }: any) {
 
     // Upload API
     const handleSubmit = async () => {
-        if (photos.length === 0) return;
+        if (photos.length === 0) {
+            Alert.alert("No photos", "Please add at least one photo", [{ text: "OK" }]);
+            return;
+        }
 
         try {
             setLoading(true);
@@ -165,14 +168,14 @@ export default function Step7({ form, setForm, next, back }: any) {
             />
 
             {/* Skip Button */}
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 onPress={next}
                 style={{ marginTop: spacing.md, alignItems: "center" }}
             >
                 <AppText style={styles.skipText}>
                     Skip for now
                 </AppText>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </ScreenWrapper>
     );
 }

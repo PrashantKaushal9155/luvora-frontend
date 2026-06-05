@@ -1,4 +1,6 @@
+import useExitAppHandler from "@/components/hooks/useExitAppHandler";
 import CustomButton from "@/components/ui/CustomButton";
+import ExitModal from "@/components/ui/ExitModal";
 import InputField from "@/components/ui/InputField";
 import { login } from "@/services/authService";
 import { useAuthStore } from "@/store/authStore";
@@ -6,7 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import { useState } from "react";
-import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { Alert, BackHandler, Text, TouchableOpacity, View } from "react-native";
 import * as Yup from "yup";
 import styles from "./login.styles";
 
@@ -22,20 +24,18 @@ const LoginSchema = Yup.object().shape({
 export default function LoginScreen() {
     const setAuth = useAuthStore((state) => state.setAuth);
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [showExitModal, setShowExitModal] = useState(false);
     const router = useRouter();
+
+    useExitAppHandler(() => {
+        setShowExitModal(true);
+    });
 
     const handleLogin = async (email: string, password: string) => {
         try {
             console.log("LoginClicked");
             const response = await login(email, password);
-
-            if (!response || response.status !== 200) {
-                Alert.alert("Server Error", "We're having trouble reaching the server. Please try again in a moment.");
-                return;
-            }
 
             if (!response.profileCompleted) {
                 router.replace("/profile/setup");
@@ -46,6 +46,10 @@ export default function LoginScreen() {
             setAuth(response.accessToken, response.refreshToken, response.profileCompleted);
         } catch (error: any) {
             console.log("Login Failed", JSON.stringify(error?.response?.data || "Error"));
+            console.log("FULL ERROR:", error);
+            console.log("ERROR MESSAGE:", error.message);
+            console.log("ERROR RESPONSE:", error.response);
+            console.log("ERROR REQUEST:", error.request);
             if (error.response) {
                 // Server responded with error (500, 404, etc.)
                 Alert.alert("Server Issue","Something went wrong on our side. Please try again later.");
@@ -113,9 +117,23 @@ export default function LoginScreen() {
 
                     <CustomButton title="Login" onPress={handleSubmit as any} />
 
-                    <Text style={styles.footer}>
-                        Don't have an account? <Text style={styles.link}>Sign up</Text>
-                    </Text>
+                    <TouchableOpacity onPress={() => router.push("/auth/register")}>
+                        <Text style={styles.footer}>
+                            Don't have an account? <Text style={styles.link}>Sign up</Text>
+                        </Text>
+                    </TouchableOpacity>
+
+                    <ExitModal
+                        visible={showExitModal}
+                        onCancel={() => setShowExitModal(false)}
+                        onConfirm={() => { 
+                            setShowExitModal(false);
+
+                            setTimeout(() => {
+                                BackHandler.exitApp();
+                            }, 100);
+                        }}
+                    />
                 </View>
             )}
         </Formik>
